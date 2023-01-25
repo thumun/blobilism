@@ -6,9 +6,14 @@
 using namespace tinygl;
 using namespace std;
 
+struct Triple{
+  int _x; 
+  int _y; 
+  int _diameter; 
+};
+
 // can know if mouse clicked by position !!! 
 struct CircleButton{
-
     glm::vec3 * _color; 
     int _x; 
     int _y; 
@@ -22,36 +27,41 @@ struct CircleButton{
     }
 
     ~CircleButton(){ 
-      delete _color; 
-    };
+      if (_color != NULL){
+        delete _color; 
+      }
+    }
 
   };
 
   struct MouseInput{
-    glm::vec3 * _currColor; 
+    glm::vec3 * _currColor = NULL; 
     int _brushSize;
-    float _clickX; 
-    float _clickY; 
+    float _posX; 
+    float _posY; 
     float _transparency; // might have to put this elsewhere 
 
     MouseInput(int brushSize, float x, float y, float transparency){
       _brushSize = brushSize;
-      _clickX = x;
-      _clickY = y; 
-      _transparency = _transparency; 
+      _posX = x;
+      _posY = y; 
+      _transparency = transparency; 
     }
 
     void setColor(glm::vec3 * color){
-      _currColor = color;
+      if (_currColor != NULL){
+        delete _currColor; 
+      } 
+      _currColor = new glm::vec3 (color->x, color->y, color->z);
     }
 
     void increaseBrushSize(){
-      _brushSize += 0.05; 
+      _brushSize += 5; 
     }
 
     void decreaseBrushSize(){
       if (_brushSize != 0){
-        _brushSize -= 0.05; 
+        _brushSize -= 5; 
       }
     }
 
@@ -68,7 +78,9 @@ struct CircleButton{
     }
 
     ~MouseInput(){ 
-      delete _currColor;
+      if (_currColor != NULL){
+        delete _currColor;
+      }
     }
   };
 
@@ -97,12 +109,14 @@ class MyWindow : public Window {
       // todo: store a circle with the current color, size, x, y
 
       // if color not selected
-      if (mouseInput->color == NULL){
-        cout >> "color not selected" << std::endl;
+      if (mouseInput->_currColor == NULL){
+        cout << "color not selected" << std::endl;
       }
       else{
-        // draw info here !!! 
-        // put "strokes" into a list ?? so easier to clear 
+        mouseInput->_posX = x; 
+        mouseInput->_posY = y; 
+        strokes.push_back({(int)mouseInput->_posX, (int)mouseInput->_posY, (int)mouseInput->_brushSize});
+        
       }
     }
   }
@@ -116,9 +130,15 @@ class MyWindow : public Window {
       float clickPt; 
 
       for (CircleButton * i : circs){
-        clickPt = sqrt(pow((my - i->_x), 2) + pow((mx - i->_y), 2)); 
-        if((i->_diameter/2) >= clickPt){
-          
+
+        // cout << i->_x << "," << i->_y << endl; 
+        // cout << mx << "," << my << endl; 
+
+        clickPt = sqrt(pow((mx - i->_x), 2) + pow((my - i->_y), 2)); 
+        if(clickPt <= (i->_diameter/2)){
+          mouseInput->setColor(i->_color);
+          cout << "Setting color to " << mouseInput->_currColor->x << " " << mouseInput->_currColor->y << " " << mouseInput->_currColor->z << endl;
+          return;
         }
       }
     }
@@ -127,39 +147,49 @@ class MyWindow : public Window {
   void keyDown(int key, int mods) {
     if (key == GLFW_KEY_UP) {
       // increase size of circle
-      int sizeNum = 0; 
-
+      mouseInput->increaseBrushSize(); 
       
-      cout << "Pressed UP: Increase point size to " << sizeNum << endl; 
+      cout << "Pressed UP: Increase point size to " << mouseInput->_brushSize << endl; 
     } 
     else if (key == GLFW_KEY_DOWN) {
       // decrease size of circle
-      int sizeNum = 0; 
+      mouseInput->decreaseBrushSize(); 
 
-      cout << "Pressed DOWN: Decrease point size to " << sizeNum << endl;
+      cout << "Pressed DOWN: Decrease point size to " << mouseInput->_brushSize << endl;
     }
     else if (key == GLFW_KEY_LEFT) {
       // decrease alpha
-      int sizeNum = 0; 
+      mouseInput->decreaseTransparency(); 
 
-      cout << "Pressed LEFT: Increase point size to " << sizeNum << endl;
+      cout << "Pressed LEFT: Decrease transparency to " << mouseInput->_transparency << endl;
     }
     else if (key == GLFW_KEY_RIGHT) {
       // increase alpha
-      int sizeNum = 0; 
+      mouseInput->increaseTransparency(); 
 
-      cout << "Pressed RIGHT: Decrease point size to " << sizeNum << endl;
+      cout << "Pressed RIGHT: Increase transparency to " << mouseInput->_transparency << endl;
     }
     else if (key == GLFW_KEY_C) {
       // clear vector of circles
+
+      // for (Triple i : strokes){
+
+      // }
+
+      cout << "Clear screen" << endl; 
     }
   }
 
   void draw() override {
     background(0.95f, 0.95f, 0.95f); // parameters: r, g, b
 
-    // color(1.0f, 0.5f, 0.5f);
-    // circle(width() * 0.5f, height() * 0.5, 300);
+    if (strokes.size() != 0){
+      for (Triple i : strokes){
+        color(mouseInput->_currColor->x, mouseInput->_currColor->y, mouseInput->_currColor->z, mouseInput->_transparency);
+        circle(i._x, i._y, i._diameter);
+      }
+    }
+    
 
     // todo : draw pallet
     color(0.1f, 0.1f, 0.1f);
@@ -175,25 +205,29 @@ class MyWindow : public Window {
     for (CircleButton * i : circs){
       delete i; 
     }
-    delete mouseInput;
-  };
+
+    if (mouseInput != NULL){
+      delete mouseInput;
+    }
+  }
  private:
 
   // todo: create member variables for 
   // current circle size
   // current transparency
   // current color
-  // list of circles to draw each frame
 
+  // list of circles to draw each frame
+  // https://www.geeksforgeeks.org/store-data-triplet-vector-c/ --> used to figure out how to store a triple 
+  vector<Triple> strokes; 
 
   // ARE THESE UNDERSCORES W/ NAMES ?? 
   // mouse inputs/data 
-  MouseInput * mouseInput; 
+  MouseInput * mouseInput = NULL; 
 
    // color pallet
   vector<CircleButton *> circs;
   
- 
 };
 
 int main() {
