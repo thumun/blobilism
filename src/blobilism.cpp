@@ -27,17 +27,59 @@ struct CircleButton{
 
   };
 
-  struct mouseInput{
-    glm::vec3 _currColor; 
+  struct MouseInput{
+    glm::vec3 * _currColor; 
     int _brushSize;
-    int _clickX; // data type?? 
-    int _clickY; // data type ?? 
+    float _clickX; 
+    float _clickY; 
     float _transparency; // might have to put this elsewhere 
+
+    MouseInput(int brushSize, float x, float y, float transparency){
+      _brushSize = brushSize;
+      _clickX = x;
+      _clickY = y; 
+      _transparency = _transparency; 
+    }
+
+    void setColor(glm::vec3 * color){
+      _currColor = color;
+    }
+
+    void increaseBrushSize(){
+      _brushSize += 0.05; 
+    }
+
+    void decreaseBrushSize(){
+      if (_brushSize != 0){
+        _brushSize -= 0.05; 
+      }
+    }
+
+    void increaseTransparency() {
+      if (_transparency != 1.0){ 
+        _transparency += 0.05; 
+      }
+    }
+
+    void decreaseTransparency() {
+      if (_transparency != 0){
+        _transparency -= 0.05; 
+      }
+    }
+
+    ~MouseInput(){ 
+      delete _currColor;
+    }
   };
 
 class MyWindow : public Window {
  public:
   MyWindow(int w, int h) : Window(w, h) {
+
+    // probably want to change this ?? --- current: brush size: 50px, coords(0, 0) will set when in motion, 100% opacity 
+    // color = null (should code that can't draw anything unless color selected)
+    mouseInput = new MouseInput(50, 0, 0, 1);
+
     circs.push_back(new CircleButton(new glm::vec3(0.6, 0, 0.45), 35, 35, 50));
     circs.push_back(new CircleButton(new glm::vec3(1, 0.9, 0.95), 90, 35, 50));
     circs.push_back(new CircleButton(new glm::vec3(1, 0.86, 0.6), 145, 35, 50));
@@ -53,6 +95,15 @@ class MyWindow : public Window {
   virtual void mouseMotion(int x, int y, int dx, int dy) {
     if (mouseIsDown(GLFW_MOUSE_BUTTON_LEFT)) {
       // todo: store a circle with the current color, size, x, y
+
+      // if color not selected
+      if (mouseInput->color == NULL){
+        cout >> "color not selected" << std::endl;
+      }
+      else{
+        // draw info here !!! 
+        // put "strokes" into a list ?? so easier to clear 
+      }
     }
   }
   
@@ -62,8 +113,13 @@ class MyWindow : public Window {
       float mx = mouseX();  // current mouse pos x
       float my = mouseY();  // current mouse pos y
 
+      float clickPt; 
+
       for (CircleButton * i : circs){
-        
+        clickPt = sqrt(pow((my - i->_x), 2) + pow((mx - i->_y), 2)); 
+        if((i->_diameter/2) >= clickPt){
+          
+        }
       }
     }
   }
@@ -119,6 +175,7 @@ class MyWindow : public Window {
     for (CircleButton * i : circs){
       delete i; 
     }
+    delete mouseInput;
   };
  private:
 
@@ -128,10 +185,15 @@ class MyWindow : public Window {
   // current color
   // list of circles to draw each frame
 
-  // gotta destroy the objects 
-  vector<CircleButton *> circs;
 
-  // color pallet
+  // ARE THESE UNDERSCORES W/ NAMES ?? 
+  // mouse inputs/data 
+  MouseInput * mouseInput; 
+
+   // color pallet
+  vector<CircleButton *> circs;
+  
+ 
 };
 
 int main() {
