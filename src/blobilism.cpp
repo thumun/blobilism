@@ -1,12 +1,12 @@
 /**
  * This is the main file for Assignment 01: Blobism.
  *
- * This program is a mini drawing program. It allows the user to draw with a circle 
- * shaped brush that they can change the size of using the UP/DOWN arrow keys. They can 
- * also change the opacity of their strokes with the LEFT/RIGHT arrow keys. 
- * They can pick from one of 5 colors to draw with- and pick a color by clicking on it 
- * with the left mouse button. 
- * The canvas can be cleared with the c key. 
+ * This program is a mini drawing program. It allows the user to draw with a circle
+ * shaped brush that they can change the size of using the UP/DOWN arrow keys. They can
+ * also change the opacity of their strokes with the LEFT/RIGHT arrow keys.
+ * They can pick from one of 5 colors to draw with- and pick a color by clicking on it
+ * with the left mouse button.
+ * The canvas can be cleared with the c key.
  *
  *
  * @author: Neha Thumu
@@ -21,7 +21,7 @@
 using namespace tinygl;
 using namespace std;
 
-// holds the information for drawn strokes 
+// holds the information for drawn strokes
 struct StrokeSettings
 {
   int _x;
@@ -73,15 +73,15 @@ struct CircleButton
   }
 };
 
-// has the data for current color, brush settings, mouse position 
-// has methods to access/set these variables 
+// has the data for current color, brush settings, mouse position
+// has methods to access/set these variables
 struct MouseInput
 {
   glm::vec3 *_currColor = NULL;
   int _brushSize;
   float _posX;
   float _posY;
-  float _transparency; 
+  float _transparency;
 
   MouseInput(int brushSize, float x, float y, float transparency)
   {
@@ -91,10 +91,10 @@ struct MouseInput
     _transparency = transparency;
   }
 
-  /** * first deletes existing color and sets a new color 
+  /** * first deletes existing color and sets a new color
    * (accessed when color in palette selected)
    * @param color the new color (to be set)
-  */
+   */
   void setColor(glm::vec3 *color)
   {
     if (_currColor != NULL)
@@ -110,37 +110,40 @@ struct MouseInput
     _brushSize += 5;
   }
 
-
-  /** * decreases the size of the brush (called when DOWN pressed) 
-   * will not go to size 0 or below 
-  */
+  /** * decreases the size of the brush (called when DOWN pressed)
+   * will not go to size 0 or below
+   */
   void decreaseBrushSize()
   {
-    if (_brushSize != 0)
+    _brushSize -= 5;
+    if (_brushSize < 1)
     {
-      _brushSize -= 5;
+      _brushSize = 1;
+      
     }
   }
 
-  /** * increases opacity of the stroke (called when RIGHT pressed) 
-   * will not above 1 
-  */
+  /** * increases opacity of the stroke (called when RIGHT pressed)
+   * will not above 1
+   */
   void increaseTransparency()
   {
-    if (_transparency != 1.0)
+    _transparency += 0.05;
+    if (_transparency >= 1.0)
     {
-      _transparency += 0.05;
+      _transparency = 1.0;
     }
   }
 
-  /** * decreases opacity of the stroke (called when LEFT pressed) 
-   * will not below 0 
-  */
+  /** * decreases opacity of the stroke (called when LEFT pressed)
+   * will not below 0
+   */
   void decreaseTransparency()
   {
-    if (_transparency != 0)
+    _transparency -= 0.05;
+    if (_transparency <= 0)
     {
-      _transparency -= 0.05;
+      _transparency = 0; 
     }
   }
 
@@ -162,16 +165,16 @@ public:
     // initializng mouse input as "empty" values
     _mouseInput = new MouseInput(50, 0, 0, 1);
 
-    // initializing the color palette 
+    // initializing the color palette
 
-    // cheshire cat colors! 
+    // cheshire cat colors!
     // _circs.push_back(new CircleButton(new glm::vec3(0.6, 0, 0.45), 35, 35, 50));
     // _circs.push_back(new CircleButton(new glm::vec3(1, 0.9, 0.95), 90, 35, 50));
     // _circs.push_back(new CircleButton(new glm::vec3(1, 0.86, 0.6), 145, 35, 50));
     // _circs.push_back(new CircleButton(new glm::vec3(0, 0, 0), 200, 35, 50));
     // _circs.push_back(new CircleButton(new glm::vec3(1, 1, 1), 255, 35, 50));
 
-    // pikachu colors! 
+    // pikachu colors!
     _circs.push_back(new CircleButton(new glm::vec3(0.98, 0.79, 0.24), 35, 35, 50));
     _circs.push_back(new CircleButton(new glm::vec3(0.91, 0.16, 0.16), 90, 35, 50));
     _circs.push_back(new CircleButton(new glm::vec3(0.22, 0.22, 0.22), 145, 35, 50));
@@ -184,15 +187,15 @@ public:
     std::cout << "Window size: " << width() << ", " << height() << std::endl;
   }
 
-  /** * Draws a stroke (series of circles) when LEFT mouse btn pressed and in motion 
-   * Will not draw on top of the panel for the color palette 
+  /** * Draws a stroke (series of circles) when LEFT mouse btn pressed and in motion
+   * Will not draw on top of the panel for the color palette
    * (param info in tinygl-cpp.h)
-  */
+   */
   virtual void mouseMotion(int x, int y, int dx, int dy) override
   {
     if (mouseIsDown(GLFW_MOUSE_BUTTON_LEFT))
     {
-      // if color not selected yet 
+      // if color not selected yet
       if (_mouseInput->_currColor == NULL)
       {
         cout << "color not selected" << std::endl;
@@ -201,19 +204,19 @@ public:
       {
         _mouseInput->_posX = x;
         _mouseInput->_posY = y;
-        // adds stroke as an object stored in stroked vector to be drawn 
+        // adds stroke as an object stored in stroked vector to be drawn
         _strokes.push_back(new StrokeSettings(_mouseInput->_posX, _mouseInput->_posY,
-                                             _mouseInput->_brushSize, _mouseInput->_transparency, 
-                                             new glm::vec3(_mouseInput->_currColor->x, 
-                                             _mouseInput->_currColor->y, _mouseInput->_currColor->z)));
+                                              _mouseInput->_brushSize, _mouseInput->_transparency,
+                                              new glm::vec3(_mouseInput->_currColor->x,
+                                                            _mouseInput->_currColor->y, _mouseInput->_currColor->z)));
       }
     }
   }
 
-  /** * When mouse LEFT btn clicked on a color in the palette, 
+  /** * When mouse LEFT btn clicked on a color in the palette,
    * will save that color (to be used as stroke/drawing color)
    * (param info in tinygl-cpp.h)
-  */
+   */
   virtual void mouseDown(int button, int mods) override
   {
     if (button == GLFW_MOUSE_BUTTON_LEFT)
@@ -223,28 +226,28 @@ public:
 
       float clickPt;
 
-      // process for finding which color was selected 
-      // cycles through the color options to see if mouse was pressed on a color option 
+      // process for finding which color was selected
+      // cycles through the color options to see if mouse was pressed on a color option
       for (CircleButton *i : _circs)
       {
         clickPt = sqrt(pow((mx - i->_x), 2) + pow((my - i->_y), 2));
         if (clickPt <= (i->_diameter / 2))
         {
           _mouseInput->setColor(i->_color);
-          cout << "Setting color to " << _mouseInput->_currColor->x 
-            << " " << _mouseInput->_currColor->y << " " << _mouseInput->_currColor->z << endl;
+          cout << "Setting color to " << _mouseInput->_currColor->x
+               << " " << _mouseInput->_currColor->y << " " << _mouseInput->_currColor->z << endl;
           return;
         }
       }
     }
   }
 
-  /** Operations for when certain keys is pressed 
+  /** Operations for when certain keys is pressed
    * (param info in tinygl-cpp.h)
-  */
+   */
   void keyDown(int key, int mods) override
   {
-    // increase size of brush 
+    // increase size of brush
     if (key == GLFW_KEY_UP)
     {
       _mouseInput->increaseBrushSize();
@@ -256,19 +259,19 @@ public:
       _mouseInput->decreaseBrushSize();
       cout << "Pressed DOWN: Decrease point size to " << _mouseInput->_brushSize << endl;
     }
-    // decrease opacity 
+    // decrease opacity
     else if (key == GLFW_KEY_LEFT)
     {
       _mouseInput->decreaseTransparency();
       cout << "Pressed LEFT: Decrease transparency to " << _mouseInput->_transparency << endl;
     }
-    // increase opacity 
+    // increase opacity
     else if (key == GLFW_KEY_RIGHT)
     {
       _mouseInput->increaseTransparency();
       cout << "Pressed RIGHT: Increase transparency to " << _mouseInput->_transparency << endl;
     }
-    // clear all the drawings on the canvas 
+    // clear all the drawings on the canvas
     else if (key == GLFW_KEY_C)
     {
       _strokes.clear();
@@ -276,15 +279,15 @@ public:
     }
   }
 
-  /** * Draws background (canvas), panel for palette, palette color options, 
-   * eraser, and drawings made 
+  /** * Draws background (canvas), panel for palette, palette color options,
+   * eraser, and drawings made
    * (param info in tinygl-cpp.h)
-  */
+   */
   void draw() override
   {
     background(0.95f, 0.95f, 0.95f); // parameters: r, g, b
 
-    // draws all the strokes made 
+    // draws all the strokes made
     if (_strokes.size() != 0)
     {
       for (StrokeSettings *i : _strokes)
@@ -294,7 +297,7 @@ public:
       }
     }
 
-    // panel for color palette 
+    // panel for color palette
     color(0.1f, 0.1f, 0.1f);
     square(width() / 2.0f, 35, width(), 70);
 
@@ -305,10 +308,9 @@ public:
       circle(i->_x, i->_y, i->_diameter);
     }
 
-    // draws eraser 
+    // draws eraser
     // color(0.96f, 0.73f, 0.79f);
     // square(320, 35, width()/12, width()/10);
-
   }
 
   ~MyWindow()
@@ -318,7 +320,7 @@ public:
       delete i;
     }
 
-    _strokes.clear(); 
+    _strokes.clear();
 
     if (_mouseInput != NULL)
     {
@@ -331,7 +333,7 @@ private:
   vector<StrokeSettings *> _strokes;
 
   // mouse inputs/data
-  MouseInput * _mouseInput = NULL;
+  MouseInput *_mouseInput = NULL;
 
   // color pallet
   vector<CircleButton *> _circs;
