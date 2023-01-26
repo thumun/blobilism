@@ -6,11 +6,6 @@
 using namespace tinygl;
 using namespace std;
 
-struct Triple{
-  int _x; 
-  int _y; 
-  int _diameter; 
-};
 
 struct StrokeSettings{
   int _x; 
@@ -26,13 +21,6 @@ struct StrokeSettings{
     _transparency = transparency;
     _color = color;
   }
-
-  // void setColor(glm::vec3 * color){
-  //     if (_color != NULL){
-  //       delete _color; 
-  //     } 
-  //     _currColor = new glm::vec3 (color->x, color->y, color->z);
-  //   }
 
   ~StrokeSettings(){
     if (_color != NULL){
@@ -116,10 +104,8 @@ class MyWindow : public Window {
  public:
   MyWindow(int w, int h) : Window(w, h) {
 
-    // probably want to change this ?? --- current: brush size: 50px, coords(0, 0) will set when in motion, 100% opacity 
-    // color = null (should code that can't draw anything unless color selected)
+    // initializng mouse input as "empty" values 
     mouseInput = new MouseInput(50, 0, 0, 1);
-    // strokes = new StrokeSettings(0, 0, 0, 0); // do I need this
 
     circs.push_back(new CircleButton(new glm::vec3(0.6, 0, 0.45), 35, 35, 50));
     circs.push_back(new CircleButton(new glm::vec3(1, 0.9, 0.95), 90, 35, 50));
@@ -144,7 +130,6 @@ class MyWindow : public Window {
       else{
         mouseInput->_posX = x; 
         mouseInput->_posY = y; 
-        // strokes.push_back({(int)mouseInput->_posX, (int)mouseInput->_posY, (int)mouseInput->_brushSize});
         strokes.push_back(new StrokeSettings(mouseInput->_posX, mouseInput->_posY, mouseInput->_brushSize, mouseInput->_transparency, new glm::vec3(mouseInput->_currColor->x, mouseInput->_currColor->y, mouseInput->_currColor->z))); 
       }
     }
@@ -197,9 +182,7 @@ class MyWindow : public Window {
     else if (key == GLFW_KEY_C) {
       // clear vector of circles
 
-      // for (Triple i : strokes){
-
-      // }
+      strokes.clear(); 
 
       cout << "Clear screen" << endl; 
     }
@@ -209,11 +192,6 @@ class MyWindow : public Window {
     background(0.95f, 0.95f, 0.95f); // parameters: r, g, b
 
     if (strokes.size() != 0){
-      // for (Triple i : strokes){
-      //   color(mouseInput->_currColor->x, mouseInput->_currColor->y, mouseInput->_currColor->z, mouseInput->_transparency);
-      //   circle(i._x, i._y, i._diameter);
-      // }
-
       for (StrokeSettings * i: strokes){
         color(i->_color->x, i->_color->y, i->_color->z, i->_transparency);
         circle(i->_x, i->_y, i->_diameter); 
@@ -239,10 +217,6 @@ class MyWindow : public Window {
     if (mouseInput != NULL){
       delete mouseInput;
     }
-
-    // if (strokes != NULL){
-    //   delete strokes; 
-    // }
   }
  private:
 
@@ -253,8 +227,6 @@ class MyWindow : public Window {
 
   // list of circles to draw each frame
   // https://www.geeksforgeeks.org/store-data-triplet-vector-c/ --> used to figure out how to store a triple 
-  // vector<Triple> strokes; 
-
   vector<StrokeSettings *> strokes; 
 
   // ARE THESE UNDERSCORES W/ NAMES ?? 
