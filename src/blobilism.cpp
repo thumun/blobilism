@@ -163,9 +163,18 @@ public:
     _mouseInput = new MouseInput(50, 0, 0, 1);
 
     // initializing the color palette 
-    _circs.push_back(new CircleButton(new glm::vec3(0.6, 0, 0.45), 35, 35, 50));
-    _circs.push_back(new CircleButton(new glm::vec3(1, 0.9, 0.95), 90, 35, 50));
-    _circs.push_back(new CircleButton(new glm::vec3(1, 0.86, 0.6), 145, 35, 50));
+
+    // cheshire cat colors! 
+    // _circs.push_back(new CircleButton(new glm::vec3(0.6, 0, 0.45), 35, 35, 50));
+    // _circs.push_back(new CircleButton(new glm::vec3(1, 0.9, 0.95), 90, 35, 50));
+    // _circs.push_back(new CircleButton(new glm::vec3(1, 0.86, 0.6), 145, 35, 50));
+    // _circs.push_back(new CircleButton(new glm::vec3(0, 0, 0), 200, 35, 50));
+    // _circs.push_back(new CircleButton(new glm::vec3(1, 1, 1), 255, 35, 50));
+
+    // pikachu colors! 
+    _circs.push_back(new CircleButton(new glm::vec3(0.98, 0.79, 0.24), 35, 35, 50));
+    _circs.push_back(new CircleButton(new glm::vec3(0.91, 0.16, 0.16), 90, 35, 50));
+    _circs.push_back(new CircleButton(new glm::vec3(0.22, 0.22, 0.22), 145, 35, 50));
     _circs.push_back(new CircleButton(new glm::vec3(0, 0, 0), 200, 35, 50));
     _circs.push_back(new CircleButton(new glm::vec3(1, 1, 1), 255, 35, 50));
   }
@@ -267,7 +276,8 @@ public:
     }
   }
 
-  /** * Draws background (canvas), panel for palette, palette color options, and drawings made 
+  /** * Draws background (canvas), panel for palette, palette color options, 
+   * eraser, and drawings made 
    * (param info in tinygl-cpp.h)
   */
   void draw() override
@@ -294,6 +304,11 @@ public:
       color(i->_color->x, i->_color->y, i->_color->z);
       circle(i->_x, i->_y, i->_diameter);
     }
+
+    // draws eraser 
+    // color(0.96f, 0.73f, 0.79f);
+    // square(320, 35, width()/12, width()/10);
+
   }
 
   ~MyWindow()
@@ -302,6 +317,8 @@ public:
     {
       delete i;
     }
+
+    _strokes.clear(); 
 
     if (_mouseInput != NULL)
     {
