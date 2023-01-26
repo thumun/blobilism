@@ -9,7 +9,11 @@ This demo implements a simple drawing program based on a circle brush.
 
 ## Results
 
-TODO: Put images of what you've made here
+Cheshire Cat: 
+![kitty cat](https://github.com/thumun/blobilism/blob/main/cheshire_cat.png)
+
+Evil Pikachu: 
+![pokemon](https://github.com/thumun/blobilism/blob/main/pikachu_evil.png)
 
 ## How to build
 
