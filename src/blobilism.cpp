@@ -12,6 +12,35 @@ struct Triple{
   int _diameter; 
 };
 
+struct StrokeSettings{
+  int _x; 
+  int _y; 
+  int _diameter; 
+  float _transparency;
+  glm::vec3 * _color;  
+
+  StrokeSettings(int x, int y, int diameter, float transparency, glm::vec3 * color){
+    _x = x; 
+    _y = y; 
+    _diameter = diameter;
+    _transparency = transparency;
+    _color = color;
+  }
+
+  // void setColor(glm::vec3 * color){
+  //     if (_color != NULL){
+  //       delete _color; 
+  //     } 
+  //     _currColor = new glm::vec3 (color->x, color->y, color->z);
+  //   }
+
+  ~StrokeSettings(){
+    if (_color != NULL){
+      delete _color;
+    }
+  }
+};
+
 // can know if mouse clicked by position !!! 
 struct CircleButton{
     glm::vec3 * _color; 
@@ -31,7 +60,6 @@ struct CircleButton{
         delete _color; 
       }
     }
-
   };
 
   struct MouseInput{
@@ -91,6 +119,7 @@ class MyWindow : public Window {
     // probably want to change this ?? --- current: brush size: 50px, coords(0, 0) will set when in motion, 100% opacity 
     // color = null (should code that can't draw anything unless color selected)
     mouseInput = new MouseInput(50, 0, 0, 1);
+    // strokes = new StrokeSettings(0, 0, 0, 0); // do I need this
 
     circs.push_back(new CircleButton(new glm::vec3(0.6, 0, 0.45), 35, 35, 50));
     circs.push_back(new CircleButton(new glm::vec3(1, 0.9, 0.95), 90, 35, 50));
@@ -115,8 +144,8 @@ class MyWindow : public Window {
       else{
         mouseInput->_posX = x; 
         mouseInput->_posY = y; 
-        strokes.push_back({(int)mouseInput->_posX, (int)mouseInput->_posY, (int)mouseInput->_brushSize});
-        
+        // strokes.push_back({(int)mouseInput->_posX, (int)mouseInput->_posY, (int)mouseInput->_brushSize});
+        strokes.push_back(new StrokeSettings(mouseInput->_posX, mouseInput->_posY, mouseInput->_brushSize, mouseInput->_transparency, new glm::vec3(mouseInput->_currColor->x, mouseInput->_currColor->y, mouseInput->_currColor->z))); 
       }
     }
   }
@@ -130,10 +159,6 @@ class MyWindow : public Window {
       float clickPt; 
 
       for (CircleButton * i : circs){
-
-        // cout << i->_x << "," << i->_y << endl; 
-        // cout << mx << "," << my << endl; 
-
         clickPt = sqrt(pow((mx - i->_x), 2) + pow((my - i->_y), 2)); 
         if(clickPt <= (i->_diameter/2)){
           mouseInput->setColor(i->_color);
@@ -184,9 +209,14 @@ class MyWindow : public Window {
     background(0.95f, 0.95f, 0.95f); // parameters: r, g, b
 
     if (strokes.size() != 0){
-      for (Triple i : strokes){
-        color(mouseInput->_currColor->x, mouseInput->_currColor->y, mouseInput->_currColor->z, mouseInput->_transparency);
-        circle(i._x, i._y, i._diameter);
+      // for (Triple i : strokes){
+      //   color(mouseInput->_currColor->x, mouseInput->_currColor->y, mouseInput->_currColor->z, mouseInput->_transparency);
+      //   circle(i._x, i._y, i._diameter);
+      // }
+
+      for (StrokeSettings * i: strokes){
+        color(i->_color->x, i->_color->y, i->_color->z, i->_transparency);
+        circle(i->_x, i->_y, i->_diameter); 
       }
     }
     
@@ -209,6 +239,10 @@ class MyWindow : public Window {
     if (mouseInput != NULL){
       delete mouseInput;
     }
+
+    // if (strokes != NULL){
+    //   delete strokes; 
+    // }
   }
  private:
 
@@ -219,7 +253,9 @@ class MyWindow : public Window {
 
   // list of circles to draw each frame
   // https://www.geeksforgeeks.org/store-data-triplet-vector-c/ --> used to figure out how to store a triple 
-  vector<Triple> strokes; 
+  // vector<Triple> strokes; 
+
+  vector<StrokeSettings *> strokes; 
 
   // ARE THESE UNDERSCORES W/ NAMES ?? 
   // mouse inputs/data 
